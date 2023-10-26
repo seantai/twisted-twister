@@ -1,6 +1,7 @@
-import { useTexture } from "@react-three/drei";
+import { useTexture, useCursor } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
+import { motion } from "framer-motion-3d";
 
 export const Capsule = (props) => {
   const randomColor = useRef(
@@ -8,38 +9,54 @@ export const Capsule = (props) => {
   );
   const randomOrder = useRef([...props.colors]);
   randomOrder.current.sort(() => Math.random() - 0.5);
-  // console.log(randomOrder.current[0]);
 
   const reflection2MatcapTexture = useTexture("matcap_reflection_2.png");
 
   const capsuleRef = useRef();
-  const [pointerDown, setPointerDown] = useState(false);
-  // console.log(randomOrder)
+  const [spinning, setSpinning] = useState(true);
+  const [colorChange, setColorChange] = useState(true);
+  // const [hovered, setHovered] = useState(true);
+
+  // useCursor(hovered, "all-scroll");
 
   useFrame((state, delta) => {
-    if (capsuleRef.current && !pointerDown) {
-      // capsuleRef.current.rotation.y += 25 * delta;
+    if (capsuleRef.current) {
+      spinning && (capsuleRef.current.rotation.y += 25 * delta);
       let rotation = capsuleRef.current.rotation.y % (Math.PI * 8);
       let rotationNormalized = normalizeRadians(rotation, 0, Math.PI * 8, 0, 1);
       // console.log(rotationNormalized);
-      if (rotationNormalized > 0 && rotationNormalized <= 0.25) {
-        capsuleRef.current.material.color = randomOrder.current[0];
-      } else if (rotationNormalized > 0.25 && rotationNormalized <= 0.5) {
-        capsuleRef.current.material.color = randomOrder.current[1];
-      } else if (rotationNormalized > 0.5 && rotationNormalized <= 0.75) {
-        capsuleRef.current.material.color = randomOrder.current[2];
-      } else if (rotationNormalized > 0.75 && rotationNormalized <= 0.99) {
-        capsuleRef.current.material.color = randomOrder.current[3];
-      } else {
-        return;
+      if (colorChange) {
+        if (rotationNormalized > 0 && rotationNormalized <= 0.25) {
+          capsuleRef.current.material.color = randomOrder.current[0];
+        } else if (rotationNormalized > 0.25 && rotationNormalized <= 0.5) {
+          capsuleRef.current.material.color = randomOrder.current[1];
+        } else if (rotationNormalized > 0.5 && rotationNormalized <= 0.75) {
+          capsuleRef.current.material.color = randomOrder.current[2];
+        } else if (rotationNormalized > 0.75 && rotationNormalized <= 0.99) {
+          capsuleRef.current.material.color = randomOrder.current[3];
+        } else {
+          return;
+        }
       }
     }
   });
   return (
-    <mesh
+    <motion.mesh
+      initial={{ scale: 0 }}
+      animate={{ scale: 1 }}
       onPointerDown={() => {
-        setPointerDown(true);
+        setSpinning(false);
+        setColorChange(false);
       }}
+      onPointerUp={() => {
+        setSpinning(true);
+      }}
+      // onHoverStart={() => {
+      //   setHovered(true);
+      // }}
+      // onHoverEnd={() => {
+      //   setHovered(false);
+      // }}
       ref={capsuleRef}
       rotation-z={0.1}
       position={[0, 0, 1.2]}
@@ -49,7 +66,7 @@ export const Capsule = (props) => {
         matcap={reflection2MatcapTexture}
         color={randomColor.current}
       />
-    </mesh>
+    </motion.mesh>
   );
 };
 

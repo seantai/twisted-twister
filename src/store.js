@@ -5,4 +5,5 @@ export const store = proxy({
   yellowCount: 1,
   greenCount: 1,
   blueCount: 1,
+  loaded: false,
 });
