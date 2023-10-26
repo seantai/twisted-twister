@@ -2,8 +2,11 @@ import { useTexture, useCursor } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import { motion } from "framer-motion-3d";
+import { store } from "../store";
+import { useSnapshot } from "valtio";
 
 export const Capsule = (props) => {
+  const snap = useSnapshot(store);
   const randomColor = useRef(
     props.colors[Math.floor(Math.random() * props.colors.length)]
   );
@@ -15,9 +18,9 @@ export const Capsule = (props) => {
   const capsuleRef = useRef();
   const [spinning, setSpinning] = useState(true);
   const [colorChange, setColorChange] = useState(true);
-  // const [hovered, setHovered] = useState(true);
+  const [hovered, setHovered] = useState(false);
 
-  // useCursor(hovered, "all-scroll");
+  useCursor(hovered, "all-scroll");
 
   useFrame((state, delta) => {
     if (capsuleRef.current) {
@@ -47,16 +50,17 @@ export const Capsule = (props) => {
       onPointerDown={() => {
         setSpinning(false);
         setColorChange(false);
+        // setHovered(true);
       }}
       onPointerUp={() => {
         setSpinning(true);
       }}
-      // onHoverStart={() => {
-      //   setHovered(true);
-      // }}
-      // onHoverEnd={() => {
-      //   setHovered(false);
-      // }}
+      onPointerOver={() => {
+        snap.start && setHovered(true);
+      }}
+      onPointerLeave={() => {
+        setHovered(false);
+      }}
       ref={capsuleRef}
       rotation-z={0.1}
       position={[0, 0, 1.2]}

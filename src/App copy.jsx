@@ -5,11 +5,10 @@ import {
   Svg,
   useGLTF,
   useTexture,
-  useHelper,
 } from "@react-three/drei";
 import { Canvas, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
-import { Box3, Color, BoxHelper } from "three";
+import { Box3, Color } from "three";
 import { DragControls } from "three-stdlib";
 import { Capsule } from "./components/Capsule";
 
@@ -20,10 +19,9 @@ import { store } from "./store";
 import { MyTimer } from "./components/Timer";
 
 const Scene = ({ parentRef, startClicked }) => {
-  const { controls, camera, scene } = useThree();
+  const { controls, camera } = useThree();
 
   const { nodes } = useGLTF("/1026_BackdropSpheres.glb");
-  const Dump = useGLTF("./1026_Dump-transformed.glb");
 
   const snap = useSnapshot(store);
 
@@ -34,9 +32,6 @@ const Scene = ({ parentRef, startClicked }) => {
   const blueRef = useRef();
   const greenRef = useRef();
   const yellowRef = useRef();
-
-  // const svgRef = useRef();
-  const dumpRef = useRef();
 
   const refsArray = [redRef, blueRef, greenRef, yellowRef];
 
@@ -65,12 +60,6 @@ const Scene = ({ parentRef, startClicked }) => {
     <Capsule colors={colors} key={uuidv4()} startClicked={startClicked} />,
   ]);
 
-  // useHelper(dumpRef, BoxHelper);
-  // useHelper(yellowRef, BoxHelper);
-  // useHelper(greenRef, BoxHelper);
-  // useHelper(redRef, BoxHelper);
-  // useHelper(blueRef, BoxHelper);
-
   useEffect(() => {
     if (startClicked) {
       const controls = new DragControls(
@@ -90,22 +79,12 @@ const Scene = ({ parentRef, startClicked }) => {
 
         const sphereBox = new Box3();
 
-        if (dumpRef.current) {
-          const dumpBox = new Box3();
-          dumpBox.setFromObject(dumpRef.current);
-          // console.log(dumpBox);
-          if (dragBox.intersectsBox(dumpBox)) {
-            e.object.position.set(10, 10, 10);
-            addMesh();
-          }
-        }
         // if(trash){
         //   do the thang
         // }
 
         refsArray.forEach((ref) => {
           //
-
           if (dragColor.equals(ref.current.material.color)) {
             sphereBox.setFromObject(ref.current);
             if (dragBox.intersectsBox(sphereBox)) {
@@ -280,20 +259,7 @@ const Scene = ({ parentRef, startClicked }) => {
           </Html>
         </mesh>
       </group>
-      {/* <Svg
-        ref={svgRef}
-        scale={0.03}
-        src={"./icons8-trash.svg"}
-        // hehehe="heheheh"
-        position={[0, 3, 1]}
-      /> */}
-      <mesh
-        ref={dumpRef}
-        geometry={Dump.nodes.Dump.geometry}
-        position={[0, 3, 1]}
-      >
-        <meshMatcapMaterial matcap={reflection2MatcapTexture} />
-      </mesh>
+      <Svg src={"./icons8-trash.svg"} />
       <CameraControls
         makeDefault
         mouseButtons={{ left: 0, middle: 0, right: 0, wheel: 0 }}
@@ -361,4 +327,3 @@ export default function App() {
 }
 
 useGLTF.preload("/1025_Backdrop.glb");
-useGLTF.preload("/1026_Dump.glb");
