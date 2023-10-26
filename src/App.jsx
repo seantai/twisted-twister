@@ -1,28 +1,43 @@
+import {
+  Bvh,
+  CameraControls,
+  Html,
+  useGLTF,
+  useTexture,
+  StatsGl,
+} from "@react-three/drei";
 import { Canvas, useThree } from "@react-three/fiber";
-import { Bvh, CameraControls } from "@react-three/drei";
-import { useGLTF } from "@react-three/drei";
-import { useEffect } from "react";
-import { useRef } from "react";
-import { useTexture } from "@react-three/drei";
+import { useEffect, useRef } from "react";
 import { Color } from "three";
+import { useState } from "react";
+import { Box3 } from "three";
+import { DragControls } from "three-stdlib";
+import { Capsule } from "./components/Capsule";
+
+import { v4 as uuidv4 } from "uuid";
 
 const Scene = () => {
-  const { nodes, materials } = useGLTF("/1025_Backdrop.glb");
+  const {
+    controls,
+    camera,
+    gl: { domElement },
+  } = useThree();
 
-  const redColor = new Color("hsl(344, 100%, 61%)");
-  const blueColor = new Color("hsl(208, 100%, 61%)");
-  const greenColor = new Color("hsl(49, 97%, 65%)");
-  const yellowColor = new Color("hsl(83, 57%, 47%)");
+  const { nodes } = useGLTF("/1025_Backdrop.glb");
+
+  const draggableObjects = useRef();
+  const circleGroupRef = useRef();
 
   const redRef = useRef();
   const blueRef = useRef();
   const greenRef = useRef();
   const yellowRef = useRef();
 
-  const reflection2MatcapTexture = useTexture("matcap_reflection_2.png");
+  const [redCount, setRedCount] = useState();
 
-  const circleGroupRef = useRef();
-  const { controls } = useThree();
+  const refsArray = [redRef, blueRef, greenRef, yellowRef];
+
+  const reflection2MatcapTexture = useTexture("matcap_reflection_2.png");
 
   useEffect(() => {
     if (controls && circleGroupRef.current) {
@@ -30,31 +45,109 @@ const Scene = () => {
     }
   }, [controls, circleGroupRef.current]);
 
+  const redColor = new Color("hsl(344, 100%, 61%)");
+  const blueColor = new Color("hsl(208, 100%, 61%)");
+  const greenColor = new Color("hsl(49, 97%, 65%)");
+  const yellowColor = new Color("hsl(83, 57%, 47%)");
+
+  const colors = [redColor, blueColor, greenColor, yellowColor];
+
+  const addMesh = () => {
+    setMeshes([<Capsule colors={colors} key={uuidv4()} />]);
+  };
+
+  const [meshes, setMeshes] = useState([
+    <Capsule colors={colors} key={uuidv4()} />,
+  ]);
+
+  useEffect(() => {
+    const controls = new DragControls(
+      [draggableObjects.current],
+      camera,
+      domElement
+    );
+
+    const handleDrag = (e) => {
+      e.object.position.z = 0;
+    };
+
+    const handleDragEnd = (e) => {
+      const sphereBox = new Box3();
+      // const sphereSphere = new Sphere();
+      const dragBox = new Box3();
+      dragBox.setFromObject(draggableObjects.current);
+
+      const dragColor = e.object.material.color;
+
+      refsArray.forEach((ref) => {
+        if (dragColor.equals(ref.current.material.color)) {
+          sphereBox.setFromObject(ref.current);
+          // sphereSphere.getBoundingBox.setFromObject(ref.current);
+        }
+      });
+
+      if (dragBox.intersectsBox(sphereBox)) {
+        console.log("intersected");
+        e.object.position.set(10, 10, 10);
+        addMesh();
+      }
+    };
+
+    controls.addEventListener("drag", handleDrag);
+    controls.addEventListener("dragend", handleDragEnd);
+
+    return () => {
+      controls.removeEventListener("drag", handleDrag);
+      controls.removeEventListener("dragend", handleDragEnd);
+      controls.dispose();
+    };
+  }, []);
+
   return (
     <>
+      <group ref={draggableObjects}>{meshes}</group>
       <mesh geometry={nodes.Backdrop.geometry}>
         <meshStandardMaterial color={"#efefef"} />
       </mesh>
       <group ref={circleGroupRef}>
-        <mesh geometry={nodes.RedSphere.geometry} position={[-3, 2, 0]}>
+        <mesh
+          ref={redRef}
+          geometry={nodes.RedSphere.geometry}
+          position={[-3, 2, 0]}
+        >
           <meshMatcapMaterial
             matcap={reflection2MatcapTexture}
             color={redColor}
           />
+          <Html transform>
+            <div className="text-3xl">3</div>
+          </Html>
         </mesh>
-        <mesh geometry={nodes.GreenSphere.geometry} position={[3, 2, 0]}>
+        <mesh
+          ref={greenRef}
+          geometry={nodes.GreenSphere.geometry}
+          position={[3, 2, 0]}
+        >
           <meshMatcapMaterial
             matcap={reflection2MatcapTexture}
             color={greenColor}
           />
         </mesh>
-        <mesh geometry={nodes.YellowSphere.geometry} position={[-3, -2, 0]}>
+        <mesh
+          ref={yellowRef}
+          geometry={nodes.YellowSphere.geometry}
+          position={[-3, -2, 0]}
+        >
           <meshMatcapMaterial
             matcap={reflection2MatcapTexture}
             color={yellowColor}
           />
         </mesh>
-        <mesh geometry={nodes.BlueSphere.geometry} position={[3, -2, 0]}>
+        <mesh
+          ref={blueRef}
+          geometry={nodes.BlueSphere.geometry}
+          position={[3, -2, 0]}
+        >
           <meshMatcapMaterial
             matcap={reflection2MatcapTexture}
             color={blueColor}
@@ -71,6 +164,7 @@ const Scene = () => {
         maxPolarAngle={1.3}
       />
       <pointLight color="#CAD6D7" position={[0, -1, 0]} intensity={10} />
+      {/* <StatsGl /> */}
     </>
   );
 };
@@ -93,4 +187,4 @@ export default function App() {
   );
 }
 
-useGLTF.preload("/1025_Backdrop.glb");
+// useGLTF.preload("/1025_Backdrop.glb");
