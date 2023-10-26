@@ -15,6 +15,8 @@ import { DragControls } from "three-stdlib";
 import { Capsule } from "./components/Capsule";
 
 import { v4 as uuidv4 } from "uuid";
+import { store } from "./store";
+import { useSnapshot } from "valtio";
 
 const Scene = () => {
   const {
@@ -25,6 +27,8 @@ const Scene = () => {
 
   const { nodes } = useGLTF("/1025_Backdrop.glb");
 
+  const snap = useSnapshot(store);
+
   const draggableObjects = useRef();
   const circleGroupRef = useRef();
 
@@ -32,8 +36,6 @@ const Scene = () => {
   const blueRef = useRef();
   const greenRef = useRef();
   const yellowRef = useRef();
-
-  const [redCount, setRedCount] = useState();
 
   const refsArray = [redRef, blueRef, greenRef, yellowRef];
 
@@ -72,25 +74,51 @@ const Scene = () => {
     };
 
     const handleDragEnd = (e) => {
-      const sphereBox = new Box3();
-      // const sphereSphere = new Sphere();
       const dragBox = new Box3();
-      dragBox.setFromObject(draggableObjects.current);
-
+      dragBox.setFromObject(e.object);
       const dragColor = e.object.material.color;
+
+      const sphereBox = new Box3();
 
       refsArray.forEach((ref) => {
         if (dragColor.equals(ref.current.material.color)) {
           sphereBox.setFromObject(ref.current);
-          // sphereSphere.getBoundingBox.setFromObject(ref.current);
+          if (dragBox.intersectsBox(sphereBox)) {
+            console.log("intersected");
+
+            e.object.position.set(10, 10, 10);
+            if (ref.current.colorID == "red") {
+              if (!store.redCount == 0) {
+                store.redCount = store.redCount - 1;
+              } else {
+                // console.log("finished red");
+              }
+            }
+            if (ref.current.colorID == "yellow") {
+              if (!store.yellowCount == 0) {
+                store.yellowCount = store.yellowCount - 1;
+              } else {
+                // console.log("finished yellow");
+              }
+            }
+            if (ref.current.colorID == "green") {
+              if (!store.greenCount == 0) {
+                store.greenCount = store.greenCount - 1;
+              } else {
+                // console.log("finished green");
+              }
+            }
+            if (ref.current.colorID == "blue") {
+              if (!store.blueCount == 0) {
+                store.blueCount = store.blueCount - 1;
+              } else {
+                // console.log("finished blue");
+              }
+            }
+            addMesh();
+          }
         }
       });
-
-      if (dragBox.intersectsBox(sphereBox)) {
-        console.log("intersected");
-        e.object.position.set(10, 10, 10);
-        addMesh();
-      }
     };
 
     controls.addEventListener("drag", handleDrag);
@@ -103,6 +131,18 @@ const Scene = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (
+      snap.redCount == 0 &&
+      snap.yellowCount == 0 &&
+      snap.greenCount == 0 &&
+      snap.blueCount == 0
+    ) {
+      ////fire off the meshline stuff here
+      alert("u win");
+    }
+  }, [snap.redCount, snap.yellowCount, snap.blueCount, snap.greenCount]);
+
   return (
     <>
       <group ref={draggableObjects}>{meshes}</group>
@@ -112,6 +152,7 @@ const Scene = () => {
       <group ref={circleGroupRef}>
         <mesh
           ref={redRef}
+          colorID="red"
           geometry={nodes.RedSphere.geometry}
           position={[-3, 2, 0]}
         >
@@ -120,21 +161,12 @@ const Scene = () => {
             color={redColor}
           />
           <Html transform>
-            <div className="text-3xl">3</div>
+            <div className="text-3xl">{snap.redCount}</div>
           </Html>
         </mesh>
         <mesh
-          ref={greenRef}
-          geometry={nodes.GreenSphere.geometry}
-          position={[3, 2, 0]}
-        >
-          <meshMatcapMaterial
-            matcap={reflection2MatcapTexture}
-            color={greenColor}
-          />
-        </mesh>
-        <mesh
           ref={yellowRef}
+          colorID="yellow"
           geometry={nodes.YellowSphere.geometry}
           position={[-3, -2, 0]}
         >
@@ -142,9 +174,28 @@ const Scene = () => {
             matcap={reflection2MatcapTexture}
             color={yellowColor}
           />
+          <Html transform>
+            <div className="text-3xl">{snap.yellowCount}</div>
+          </Html>
         </mesh>
         <mesh
+          ref={greenRef}
+          colorID="green"
+          geometry={nodes.GreenSphere.geometry}
+          position={[3, 2, 0]}
+        >
+          <meshMatcapMaterial
+            matcap={reflection2MatcapTexture}
+            color={greenColor}
+          />
+          <Html transform>
+            <div className="text-3xl">{snap.greenCount}</div>
+          </Html>
+        </mesh>
+
+        <mesh
           ref={blueRef}
+          colorID="blue"
           geometry={nodes.BlueSphere.geometry}
           position={[3, -2, 0]}
         >
@@ -152,6 +203,9 @@ const Scene = () => {
             matcap={reflection2MatcapTexture}
             color={blueColor}
           />
+          <Html transform>
+            <div className="text-3xl">{snap.blueCount}</div>
+          </Html>
         </mesh>
       </group>
       <CameraControls
