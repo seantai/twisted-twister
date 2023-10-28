@@ -5,7 +5,7 @@ import { motion } from "framer-motion-3d";
 // import { store } from "../store";
 // import { useSnapshot } from "valtio";
 
-export const Capsule = (props) => {
+export const Hand = (props) => {
   // const snap = useSnapshot(store);
   const randomColor = useRef(
     props.colors[Math.floor(Math.random() * props.colors.length)]
@@ -19,11 +19,15 @@ export const Capsule = (props) => {
   const [spinning, setSpinning] = useState(true);
   const [colorChange, setColorChange] = useState(true);
 
+  const { nodes } = useGLTF("1027_Hand2.glb");
+  const Sock = useGLTF("1027_Sock.glb");
+
   useFrame((state, delta) => {
     if (capsuleRef.current) {
       spinning && (capsuleRef.current.rotation.y += 15 * delta);
       let rotation = capsuleRef.current.rotation.y % (Math.PI * 8);
       let rotationNormalized = normalizeRadians(rotation, 0, Math.PI * 8, 0, 1);
+      // console.log(rotationNormalized);
       if (colorChange) {
         if (rotationNormalized > 0 && rotationNormalized <= 0.25) {
           capsuleRef.current.material.color = randomOrder.current[0];
@@ -40,23 +44,31 @@ export const Capsule = (props) => {
     }
   });
 
+  // const alphaHandTexture = useTexture("AlphaHand.png");
   return (
     <motion.mesh
       initial={{ scale: 0 }}
-      animate={{ scale: 0.7, transition: { duration: 0.2 } }}
+      animate={{ scale: 1, transition: { duration: 0.2 } }}
       onPointerDown={() => {
         setSpinning(false);
         setColorChange(false);
       }}
+      // onPointerUp={() => {
+      //   setSpinning(true);
+      // }}
       onPointerLeave={() => {
         setSpinning(true);
       }}
       ref={capsuleRef}
       rotation-z={0.1}
+      geometry={nodes.Hand2.geometry}
     >
-      <capsuleGeometry args={[1, 1, 4, 40]} />
+      {/* <capsuleGeometry /> */}
+      {/* <tubeGeometry /> */}
+      {/* <meshBasicMaterial color={randomColor} /> */}
       <meshMatcapMaterial
         matcap={reflection2MatcapTexture}
+        // alphaMap={alphaHandTexture}
         color={randomColor.current}
       />
     </motion.mesh>
