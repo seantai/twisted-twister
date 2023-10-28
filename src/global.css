@@ -1,14 +1,11 @@
 @font-face {
   font-family: "FiraGO";
-  src: url("./FiraGO-Regular.latin.woff2") format("woff2");
+  src: url("../public/FiraGO-Regular.latin.woff2") format("woff2");
 }
-/* @font-face {
-  font-family: "Organical";
-  src: url("./Organical.ttf") format("ttf");
-} */
+
 @font-face {
   font-family: "Super Dessert";
-  src: url("./super_dessert.woff2") format("woff2");
+  src: url("../public/super_dessert.woff2") format("woff2");
 }
 
 @tailwind base;

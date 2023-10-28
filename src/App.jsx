@@ -281,47 +281,52 @@ const Scene = ({ parentRef, addTimer }) => {
       store.gameOn = false;
       store.showContinue = true;
 
-      switch (snap.level) {
-        case 1:
+      switch (snap.level - 1) {
+        case 0:
           store.yellowCount = 0;
+          store.blueCount = 0;
+          store.redCount = 0;
+          store.greenCount = 0;
+
+          break;
+        case 1:
+          store.yellowCount = 1;
           store.blueCount = 1;
           store.redCount = 2;
-          store.greenCount = 1;
+          store.greenCount = 2;
+
           break;
 
         case 2:
-          store.yellowCount = 0;
+          store.yellowCount = 2;
           store.blueCount = 2;
           store.redCount = 2;
           store.greenCount = 1;
+
           break;
 
         case 3:
           store.yellowCount = 3;
-          store.blueCount = 2;
-          store.redCount = 1;
-          store.greenCount = 1;
+          store.blueCount = 3;
+          store.redCount = 2;
+          store.greenCount = 3;
+
           break;
 
         case 4:
           store.yellowCount = 3;
-          store.blueCount = 3;
-          store.redCount = 1;
+          store.blueCount = 4;
+          store.redCount = 2;
           store.greenCount = 3;
+
           break;
 
         case 5:
-          store.yellowCount = 3;
-          store.blueCount = 3;
-          store.redCount = 1;
+          store.yellowCount = 5;
+          store.blueCount = 4;
+          store.redCount = 2;
           store.greenCount = 3;
-          break;
 
-        case 6:
-          store.yellowCount = 6;
-          store.blueCount = 2;
-          store.redCount = 1;
-          store.greenCount = 2;
           break;
 
         default:
@@ -338,7 +343,7 @@ const Scene = ({ parentRef, addTimer }) => {
   return (
     <>
       <group ref={draggableObjects}>
-        {meshes.map((mesh, index) => {
+        {meshes.map((mesh) => {
           switch (mesh.type) {
             case "Capsule":
               return <Capsule colors={mesh.colors} key={uuidv4()} />;
@@ -470,7 +475,7 @@ const Scene = ({ parentRef, addTimer }) => {
         minPolarAngle={1}
         maxPolarAngle={1.3}
       />
-      <pointLight color="#CAD6D7" position={[0, -1, 0]} intensity={10} />
+      <pointLight color="#CAD6D7" position={[0, -1, 2]} intensity={12} />
       {snap.showConfetti && (
         <m.group
           initial={{ scale: 0 }}
@@ -637,4 +642,4 @@ export default function App() {
 }
 
 useGLTF.preload("/1026_BackdropSpheres.glb");
-useGLTF.preload("/1026_Dump.glb");
+useGLTF.preload("/1026_Dump-transformed.glb");

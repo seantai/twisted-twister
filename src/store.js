@@ -1,25 +1,20 @@
 import { proxy } from "valtio";
 
 export const store = proxy({
+  level: 1,
+
   redCount: 1,
   yellowCount: 1,
   greenCount: 1,
   blueCount: 1,
-  loaded: false,
-  start: false,
-  showStart: true,
-  finished: false,
-  roundTimeLength: 3,
-  showModal: false,
-  expired: false,
-  level: 1,
-  resume: null,
-  showTimer: false,
+
   gameOn: false,
+  timerExpired: false,
+
   showContinue: false,
   showCount: false,
-  playDump: false,
   showConfetti: false,
+
+  playDump: false,
   playLevelComplete: false,
-  timerExpired: false,
 });

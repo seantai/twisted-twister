@@ -6,4 +6,4 @@ Jam theme was “Classics with a Twist!” and my mind eventually wandered towar
 
 todo:
 
-- [ ] check if sphere colors are accessible across people's visible ranges
+- check if sphere colors are accessible across people's visible ranges
