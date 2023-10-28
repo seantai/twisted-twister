@@ -19,13 +19,15 @@ import {
 } from "three";
 import { DragControls } from "./components/CustomDragControls";
 import { Capsule } from "./components/Capsule";
+import { MyTimer } from "./components/Timer";
 
 import { motion, cubicBezier } from "framer-motion";
 import { motion as m } from "framer-motion-3d";
-import { v4 as uuidv4 } from "uuid";
-import { subscribe, useSnapshot } from "valtio";
+
+import { useSnapshot } from "valtio";
 import { store } from "./store";
-import { MyTimer } from "./components/Timer";
+
+import { v4 as uuidv4 } from "uuid";
 import useSound from "use-sound";
 
 import { MeshLineGeometry, MeshLineMaterial } from "meshline";
@@ -106,10 +108,6 @@ const Scene = ({ parentRef, addTimer }) => {
   // useHelper(greenRef, BoxHelper);
   // useHelper(redRef, BoxHelper);
   // useHelper(blueRef, BoxHelper);
-
-  // const playAudio = () => {
-  //   playSuccess1();
-  // };
 
   useEffect(() => {
     if (snap.playDump) {
@@ -217,7 +215,6 @@ const Scene = ({ parentRef, addTimer }) => {
       snap.greenCount === 0 &&
       snap.blueCount === 0
     ) {
-      // console.log("level:", snap.level);
       // console.log("everything 0");
       store.playLevelComplete = true;
       store.gameOn = false;
@@ -281,12 +278,13 @@ const Scene = ({ parentRef, addTimer }) => {
       store.gameOn = false;
       store.showContinue = true;
 
+      console.log(snap.level, snap.level - 1);
       switch (snap.level - 1) {
         case 0:
-          store.yellowCount = 0;
-          store.blueCount = 0;
-          store.redCount = 0;
-          store.greenCount = 0;
+          store.yellowCount = 1;
+          store.blueCount = 1;
+          store.redCount = 1;
+          store.greenCount = 1;
 
           break;
         case 1:
@@ -571,7 +569,7 @@ export default function App() {
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: !snap.gameOn ? 1 : 0 }}
-              className="cursor-pointer rounded-sm border-2 bg-slate-700/80 px-5 py-2 text-3xl text-slate-100"
+              className="cursor-pointer rounded-xl border-2 bg-slate-700/80 px-5 py-2 text-3xl text-slate-100"
               onClick={() => {
                 // console.log(snap.level);
                 switch (snap.level) {
@@ -609,7 +607,7 @@ export default function App() {
                 whileHover={{ scale: 0.9, transition: { duration: 0.07 } }}
                 initial={{ scale: 0, fontSize: "1.85rem" }}
                 animate={{ scale: 1 }}
-                className="font-super"
+                className="font-fira"
               >
                 {!snap.showContinue && "START"}
                 {snap.showContinue && "CONTINUE"}
@@ -621,6 +619,22 @@ export default function App() {
         {timer.map((timer) => {
           return <MyTimer time={timer.time} key={uuidv4()} />;
         })}
+
+        {/* ////////////////////////////////// */}
+        <div className="fixed right-4 top-4 z-30">
+          <motion.div
+            initial={{ scale: 1, opacity: 1 }}
+            animate={{
+              scale: 1,
+              opacity: 1,
+            }}
+            className="z-30 flex px-2 py-[1px] text-center font-super text-4xl text-slate-50"
+            transition={{ scale: { delay: 1.3 }, opacity: { duration: 0.4 } }}
+          >
+            <div className="text-slate-300">Twisted&nbsp;</div>
+            <div className="">Twister</div>
+          </motion.div>
+        </div>
         {/* ////////////////////////////////// */}
         <Canvas
           className="pointer-events-none h-full w-full"
