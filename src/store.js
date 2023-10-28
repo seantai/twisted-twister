@@ -21,4 +21,5 @@ export const store = proxy({
   playDump: false,
   showConfetti: false,
   playLevelComplete: false,
+  timerExpired: false,
 });

@@ -5,6 +5,8 @@ export default {
     extend: {
       fontFamily: {
         fira: ["FiraGO", "sans-serif"],
+        // organical: ["Organical", "sans-serif"],
+        super: ["Super Dessert", "sans-serif"],
       },
     },
   },

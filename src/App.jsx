@@ -226,16 +226,16 @@ const Scene = ({ parentRef, addTimer }) => {
 
       switch (snap.level) {
         case 1:
-          store.yellowCount = 0;
+          store.yellowCount = 1;
           store.blueCount = 1;
           store.redCount = 2;
-          store.greenCount = 1;
+          store.greenCount = 2;
           store.level = 2;
           addTimer(30);
           break;
 
         case 2:
-          store.yellowCount = 0;
+          store.yellowCount = 2;
           store.blueCount = 2;
           store.redCount = 2;
           store.greenCount = 1;
@@ -244,12 +244,30 @@ const Scene = ({ parentRef, addTimer }) => {
           break;
 
         case 3:
-          store.yellowCount = 0;
-          store.blueCount = 2;
+          store.yellowCount = 3;
+          store.blueCount = 3;
           store.redCount = 2;
-          store.greenCount = 1;
-          store.level = 3;
-          addTimer(35);
+          store.greenCount = 3;
+          store.level = 4;
+          addTimer(30);
+          break;
+
+        case 4:
+          store.yellowCount = 3;
+          store.blueCount = 4;
+          store.redCount = 2;
+          store.greenCount = 3;
+          store.level = 5;
+          addTimer(30);
+          break;
+
+        case 5:
+          store.yellowCount = 5;
+          store.blueCount = 4;
+          store.redCount = 2;
+          store.greenCount = 3;
+          store.level = 6;
+          addTimer(30);
           break;
 
         default:
@@ -257,6 +275,60 @@ const Scene = ({ parentRef, addTimer }) => {
       }
     }
   }, [snap.redCount, snap.yellowCount, snap.greenCount, snap.blueCount]);
+
+  useEffect(() => {
+    if (snap.timerExpired) {
+      store.gameOn = false;
+      store.showContinue = true;
+
+      switch (snap.level) {
+        case 1:
+          store.yellowCount = 0;
+          store.blueCount = 1;
+          store.redCount = 2;
+          store.greenCount = 1;
+          break;
+
+        case 2:
+          store.yellowCount = 0;
+          store.blueCount = 2;
+          store.redCount = 2;
+          store.greenCount = 1;
+          break;
+
+        case 3:
+          store.yellowCount = 3;
+          store.blueCount = 2;
+          store.redCount = 1;
+          store.greenCount = 1;
+          break;
+
+        case 4:
+          store.yellowCount = 3;
+          store.blueCount = 3;
+          store.redCount = 1;
+          store.greenCount = 3;
+          break;
+
+        case 5:
+          store.yellowCount = 3;
+          store.blueCount = 3;
+          store.redCount = 1;
+          store.greenCount = 3;
+          break;
+
+        case 6:
+          store.yellowCount = 6;
+          store.blueCount = 2;
+          store.redCount = 1;
+          store.greenCount = 2;
+          break;
+
+        default:
+          return;
+      }
+    }
+  }, [snap.timerExpired]);
 
   useEffect(() => {
     store.loaded = true;
@@ -298,7 +370,7 @@ const Scene = ({ parentRef, addTimer }) => {
                 opacity: snap.showCount ? 1 : 0,
               }}
               transition={{ ease: cubicBezier(0.34, 1.56, 0.64, 1) }}
-              className="text-3xl"
+              className="font-fira text-3xl"
             >
               {snap.redCount}
             </motion.div>
@@ -322,7 +394,7 @@ const Scene = ({ parentRef, addTimer }) => {
                 opacity: snap.showCount ? 1 : 0,
               }}
               transition={{ ease: cubicBezier(0.34, 1.56, 0.64, 1) }}
-              className="text-3xl"
+              className="font-fira text-3xl"
             >
               {snap.yellowCount}
             </motion.div>
@@ -346,7 +418,7 @@ const Scene = ({ parentRef, addTimer }) => {
                 opacity: snap.showCount ? 1 : 0,
               }}
               transition={{ ease: cubicBezier(0.34, 1.56, 0.64, 1) }}
-              className="text-3xl"
+              className="font-fira text-3xl"
             >
               {snap.greenCount}
             </motion.div>
@@ -371,7 +443,7 @@ const Scene = ({ parentRef, addTimer }) => {
                 opacity: snap.showCount ? 1 : 0,
               }}
               transition={{ ease: cubicBezier(0.34, 1.56, 0.64, 1) }}
-              className="text-3xl"
+              className="font-fira text-3xl"
             >
               {snap.blueCount}
             </motion.div>
@@ -383,7 +455,6 @@ const Scene = ({ parentRef, addTimer }) => {
         animate={{ scale: snap.gameOn ? 1 : 0 }}
         ref={dumpRef}
         geometry={Dump.nodes.Dump.geometry}
-        //this will depend on final meshes
         position={[0, 3, 0.7]}
       >
         <meshMatcapMaterial matcap={reflection2MatcapTexture} side={2} />
@@ -400,30 +471,21 @@ const Scene = ({ parentRef, addTimer }) => {
         maxPolarAngle={1.3}
       />
       <pointLight color="#CAD6D7" position={[0, -1, 0]} intensity={10} />
+      {snap.showConfetti && (
+        <m.group
+          initial={{ scale: 0 }}
+          animate={{ scale: snap.showConfetti ? 1 : 0 }}
+          position={[0, 0, -6]}
+        >
+          <Lines
+            dash={0.9}
+            count={50}
+            radius={4}
+            colors={[redColor, blueColor, yellowColor, greenColor]}
+          />
+        </m.group>
+      )}
       {/* <StatsGl /> */}
-      <m.group
-        initial={{ scale: 0 }}
-        animate={{ scale: snap.showConfetti ? 1 : 0 }}
-        position={[0, 0, -6]}
-      >
-        <Lines
-          dash={0.9}
-          count={50}
-          radius={4}
-          colors={[
-            redColor,
-            blueColor,
-            yellowColor,
-            greenColor,
-            // [10, 0.5, 2],
-            // [1, 2, 10],
-            // "#A2CCB6",
-            // "#FCEEB5",
-            // "#EE786E",
-            // "#e0feff",
-          ]}
-        />
-      </m.group>
     </>
   );
 };
@@ -521,6 +583,18 @@ export default function App() {
                     store.gameOn = true;
                     store.showConfetti = false;
                     break;
+                  case 4:
+                    store.gameOn = true;
+                    store.showConfetti = false;
+                    break;
+                  case 5:
+                    store.gameOn = true;
+                    store.showConfetti = false;
+                    break;
+                  case 6:
+                    store.gameOn = true;
+                    store.showConfetti = false;
+                    break;
                   default:
                     break;
                 }
@@ -530,6 +604,7 @@ export default function App() {
                 whileHover={{ scale: 0.9, transition: { duration: 0.07 } }}
                 initial={{ scale: 0, fontSize: "1.85rem" }}
                 animate={{ scale: 1 }}
+                className="font-super"
               >
                 {!snap.showContinue && "START"}
                 {snap.showContinue && "CONTINUE"}
