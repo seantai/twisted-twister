@@ -7,9 +7,16 @@ import {
   useHelper,
   Bvh,
 } from "@react-three/drei";
-import { Canvas, useThree } from "@react-three/fiber";
-import { useEffect, useRef, useState } from "react";
-import { Box3, Color, BoxHelper } from "three";
+import { Canvas, useFrame, useThree, extend } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Box3,
+  Color,
+  BoxHelper,
+  MathUtils,
+  Vector3,
+  CatmullRomCurve3,
+} from "three";
 import { DragControls } from "./components/CustomDragControls";
 import { Capsule } from "./components/Capsule";
 
@@ -20,12 +27,19 @@ import { subscribe, useSnapshot } from "valtio";
 import { store } from "./store";
 import { MyTimer } from "./components/Timer";
 import useSound from "use-sound";
-import clsx from "clsx";
+
+import { MeshLineGeometry, MeshLineMaterial } from "meshline";
+extend({ MeshLineGeometry, MeshLineMaterial });
+
+import startAudio from "/0926_Enter.mp3";
+import success1Audio from "/0926_Klick1_gained.mp3";
+import dumpAudio from "/1027_Swoosh2.mp3";
+import levelCompleteAudio from "/1028_LevelComplete.mp3";
 
 const Scene = ({ parentRef, addTimer }) => {
   const { controls, camera } = useThree();
 
-  const { nodes } = useGLTF("/1026_BackdropSpheres.glb");
+  const { nodes } = useGLTF("./1026_BackdropSpheres.glb");
   const Dump = useGLTF("./1026_Dump-transformed.glb");
 
   const snap = useSnapshot(store);
@@ -50,13 +64,14 @@ const Scene = ({ parentRef, addTimer }) => {
     }
   }, [controls, circleGroupRef.current]);
 
-  const [playStart] = useSound("0926_Enter.mp3");
-  const [playSuccess1] = useSound("0926_Klick1_gained.mp3");
-  const [playDump] = useSound("1027_Swoosh2.mp3");
+  const [playStart] = useSound(startAudio);
+  const [playSuccess1] = useSound(success1Audio);
+  const [playDump] = useSound(dumpAudio);
+  const [playLevelComplete] = useSound(levelCompleteAudio);
 
   useEffect(() => {
     if (snap.gameOn) {
-      console.log("start");
+      // console.log("start");
       // console.log(controls.azimuthAngle);
       // console.log(controls.polarAngle);
 
@@ -92,6 +107,31 @@ const Scene = ({ parentRef, addTimer }) => {
   // useHelper(redRef, BoxHelper);
   // useHelper(blueRef, BoxHelper);
 
+  // const playAudio = () => {
+  //   playSuccess1();
+  // };
+
+  useEffect(() => {
+    if (snap.playDump) {
+      playDump();
+      store.playDump = false;
+    }
+  }, [snap.playDump]);
+
+  useEffect(() => {
+    if (snap.playSuccess1) {
+      playSuccess1();
+      store.playSuccess1 = false;
+    }
+  }, [snap.playSuccess1]);
+
+  useEffect(() => {
+    if (snap.playLevelComplete) {
+      playLevelComplete();
+      store.playLevelComplete = false;
+    }
+  }, [snap.playLevelComplete]);
+
   useEffect(() => {
     if (true) {
       const controls = new DragControls(
@@ -116,13 +156,7 @@ const Scene = ({ parentRef, addTimer }) => {
           const dumpBox = new Box3();
           dumpBox.setFromObject(dumpRef.current);
           if (dragBox.intersectsBox(dumpBox)) {
-            // console.log("interescted w/ dump");
-            // console.log("dragBox:", dragBox);
-            // console.log("dumpBox:", dumpBox);
-            // console.log("dumpBox:", dumpBox);
-            setTimeout(() => {
-              playDump();
-            }, 100); // Delay the sound by 1 second
+            store.playDump = true;
             addMesh();
           }
         }
@@ -134,30 +168,30 @@ const Scene = ({ parentRef, addTimer }) => {
             if (dragBox.intersectsBox(sphereBox)) {
               if (ref.current.colorID == "red") {
                 if (store.redCount !== 0) {
-                  playSuccess1();
-                  addMesh();
                   store.redCount = store.redCount - 1;
+                  addMesh();
+                  store.playSuccess1 = true;
                 }
               }
               if (ref.current.colorID == "yellow") {
                 if (store.yellowCount !== 0) {
                   store.yellowCount = store.yellowCount - 1;
-                  playSuccess1();
                   addMesh();
+                  store.playSuccess1 = true;
                 }
               }
               if (ref.current.colorID == "green") {
                 if (store.greenCount !== 0) {
                   store.greenCount = store.greenCount - 1;
-                  playSuccess1();
                   addMesh();
+                  store.playSuccess1 = true;
                 }
               }
               if (ref.current.colorID == "blue") {
                 if (store.blueCount !== 0) {
                   store.blueCount = store.blueCount - 1;
-                  playSuccess1();
                   addMesh();
+                  store.playSuccess1 = true;
                 }
               }
             }
@@ -185,27 +219,37 @@ const Scene = ({ parentRef, addTimer }) => {
     ) {
       // console.log("level:", snap.level);
       // console.log("everything 0");
+      store.playLevelComplete = true;
+      store.gameOn = false;
+      store.showContinue = true;
+      store.showConfetti = true;
+
       switch (snap.level) {
         case 1:
-          store.gameOn = false;
-          store.showContinue = true;
           store.yellowCount = 0;
-          store.blueCount = 0;
+          store.blueCount = 1;
           store.redCount = 2;
           store.greenCount = 1;
           store.level = 2;
-          addTimer(2);
+          addTimer(30);
           break;
 
         case 2:
-          store.gameOn = false;
-          store.showContinue = true;
           store.yellowCount = 0;
           store.blueCount = 2;
           store.redCount = 2;
           store.greenCount = 1;
           store.level = 3;
-          addTimer(3);
+          addTimer(30);
+          break;
+
+        case 3:
+          store.yellowCount = 0;
+          store.blueCount = 2;
+          store.redCount = 2;
+          store.greenCount = 1;
+          store.level = 3;
+          addTimer(35);
           break;
 
         default:
@@ -216,7 +260,7 @@ const Scene = ({ parentRef, addTimer }) => {
 
   useEffect(() => {
     store.loaded = true;
-    console.log("loaded");
+    // console.log("loaded");
   }, []);
 
   return (
@@ -357,16 +401,84 @@ const Scene = ({ parentRef, addTimer }) => {
       />
       <pointLight color="#CAD6D7" position={[0, -1, 0]} intensity={10} />
       {/* <StatsGl /> */}
+      <m.group
+        initial={{ scale: 0 }}
+        animate={{ scale: snap.showConfetti ? 1 : 0 }}
+        position={[0, 0, -6]}
+      >
+        <Lines
+          dash={0.9}
+          count={50}
+          radius={4}
+          colors={[
+            redColor,
+            blueColor,
+            yellowColor,
+            greenColor,
+            // [10, 0.5, 2],
+            // [1, 2, 10],
+            // "#A2CCB6",
+            // "#FCEEB5",
+            // "#EE786E",
+            // "#e0feff",
+          ]}
+        />
+      </m.group>
     </>
   );
 };
 
+function Lines({
+  dash,
+  count,
+  colors,
+  radius = 50,
+  rand = MathUtils.randFloatSpread,
+}) {
+  const lines = useMemo(() => {
+    return Array.from({ length: count }, () => {
+      const pos = new Vector3(rand(radius), rand(radius), rand(radius));
+      const points = Array.from({ length: 10 }, () =>
+        pos.add(new Vector3(rand(radius), rand(radius), rand(radius))).clone()
+      );
+      const curve = new CatmullRomCurve3(points).getPoints(300);
+      return {
+        color: colors[parseInt(colors.length * Math.random())],
+        width: Math.max(radius / 100, (radius / 50) * Math.random()),
+        speed: Math.max(0.1, 1 * Math.random()),
+        curve: curve.flatMap((point) => point.toArray()),
+      };
+    });
+  }, [colors, count, radius]);
+  return lines.map((props, index) => (
+    <Fatline key={index} dash={dash} {...props} />
+  ));
+}
+
+function Fatline({ curve, width, color, speed, dash }) {
+  const ref = useRef();
+  useFrame(
+    (state, delta) => (ref.current.material.dashOffset -= (delta * speed) / 10)
+  );
+  return (
+    <mesh ref={ref}>
+      <meshLineGeometry points={curve} />
+      <meshLineMaterial
+        transparent
+        lineWidth={width}
+        color={color}
+        depthWrite={false}
+        dashArray={0.25}
+        dashRatio={dash}
+        toneMapped={false}
+      />
+    </mesh>
+  );
+}
+
 export default function App() {
   const parentRef = useRef();
   const snap = useSnapshot(store);
-
-  //level 1: 30
-  //level 2:
 
   const [timer, setTimer] = useState([{ time: 30 }]);
 
@@ -392,24 +504,26 @@ export default function App() {
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: !snap.gameOn ? 1 : 0 }}
-              className="cursor-pointer rounded-sm border-2 bg-slate-700/60 px-5 py-2 text-3xl text-slate-100"
+              className="cursor-pointer rounded-sm border-2 bg-slate-700/80 px-5 py-2 text-3xl text-slate-100"
               onClick={() => {
-                console.log(snap.level);
+                // console.log(snap.level);
                 switch (snap.level) {
                   case 1:
                     store.gameOn = true;
                     store.showCount = true;
+                    store.showConfetti = false;
                     break;
                   case 2:
                     store.gameOn = true;
+                    store.showConfetti = false;
                     break;
                   case 3:
                     store.gameOn = true;
+                    store.showConfetti = false;
                     break;
                   default:
                     break;
                 }
-                // store.gameOn = true;
               }}
             >
               <motion.div

@@ -18,4 +18,7 @@ export const store = proxy({
   gameOn: false,
   showContinue: false,
   showCount: false,
+  playDump: false,
+  showConfetti: false,
+  playLevelComplete: false,
 });

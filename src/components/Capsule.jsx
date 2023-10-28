@@ -1,12 +1,9 @@
-import { useGLTF, useTexture } from "@react-three/drei";
+import { useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import { motion } from "framer-motion-3d";
-// import { store } from "../store";
-// import { useSnapshot } from "valtio";
 
 export const Capsule = (props) => {
-  // const snap = useSnapshot(store);
   const randomColor = useRef(
     props.colors[Math.floor(Math.random() * props.colors.length)]
   );
