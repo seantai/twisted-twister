@@ -267,6 +267,15 @@ const Scene = ({ parentRef, addTimer }) => {
           addTimer(30);
           break;
 
+        case 6:
+          store.yellowCount = 5;
+          store.blueCount = 4;
+          store.redCount = 4;
+          store.greenCount = 5;
+          store.level = 7;
+          addTimer(30);
+          break;
+
         default:
           return;
       }
@@ -278,7 +287,7 @@ const Scene = ({ parentRef, addTimer }) => {
       store.gameOn = false;
       store.showContinue = true;
 
-      console.log(snap.level, snap.level - 1);
+      // console.log(snap.level, snap.level - 1);
       switch (snap.level - 1) {
         case 0:
           store.yellowCount = 1;
@@ -294,7 +303,6 @@ const Scene = ({ parentRef, addTimer }) => {
           store.greenCount = 2;
 
           break;
-
         case 2:
           store.yellowCount = 2;
           store.blueCount = 2;
@@ -302,7 +310,6 @@ const Scene = ({ parentRef, addTimer }) => {
           store.greenCount = 1;
 
           break;
-
         case 3:
           store.yellowCount = 3;
           store.blueCount = 3;
@@ -310,7 +317,6 @@ const Scene = ({ parentRef, addTimer }) => {
           store.greenCount = 3;
 
           break;
-
         case 4:
           store.yellowCount = 3;
           store.blueCount = 4;
@@ -318,7 +324,6 @@ const Scene = ({ parentRef, addTimer }) => {
           store.greenCount = 3;
 
           break;
-
         case 5:
           store.yellowCount = 5;
           store.blueCount = 4;
@@ -326,7 +331,12 @@ const Scene = ({ parentRef, addTimer }) => {
           store.greenCount = 3;
 
           break;
-
+        case 6:
+          store.yellowCount = 5;
+          store.blueCount = 4;
+          store.redCount = 4;
+          store.greenCount = 5;
+          break;
         default:
           return;
       }
@@ -577,27 +587,37 @@ export default function App() {
                     store.gameOn = true;
                     store.showCount = true;
                     store.showConfetti = false;
+                    store.timerExpired = false;
                     break;
                   case 2:
                     store.gameOn = true;
                     store.showConfetti = false;
+                    store.timerExpired = false;
                     break;
                   case 3:
                     store.gameOn = true;
                     store.showConfetti = false;
+                    store.timerExpired = false;
                     break;
                   case 4:
                     store.gameOn = true;
                     store.showConfetti = false;
+                    store.timerExpired = false;
                     break;
                   case 5:
                     store.gameOn = true;
                     store.showConfetti = false;
+                    store.timerExpired = false;
                     break;
                   case 6:
                     store.gameOn = true;
                     store.showConfetti = false;
+                    store.timerExpired = false;
                     break;
+                  // case 7:
+                  //   store.gameOn = true;
+                  //   store.showConfetti = false;
+                  //   break;
                   default:
                     break;
                 }
@@ -609,8 +629,9 @@ export default function App() {
                 animate={{ scale: 1 }}
                 className="font-fira"
               >
-                {!snap.showContinue && "START"}
-                {snap.showContinue && "CONTINUE"}
+                {!snap.showContinue && snap.level !== 7 && "START"}
+                {snap.showContinue && snap.level !== 7 && "CONTINUE"}
+                {snap.level == 7 && "GG!"}
               </motion.div>
             </motion.div>
           )}
