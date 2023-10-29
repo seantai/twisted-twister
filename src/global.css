@@ -3,7 +3,6 @@
   src: url("/FiraGO-Regular.latin.woff2") format("woff2");
 }
 
-/* just do url("super_dessert.woff2")  ????? */
 @font-face {
   font-family: "Super Dessert";
   src: url("/super_dessert.woff2") format("woff2");

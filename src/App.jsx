@@ -4,7 +4,7 @@ import {
   StatsGl,
   useGLTF,
   useTexture,
-  useHelper,
+  // useHelper,
   Bvh,
 } from "@react-three/drei";
 import { Canvas, useFrame, useThree, extend } from "@react-three/fiber";
@@ -12,7 +12,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Box3,
   Color,
-  BoxHelper,
+  // BoxHelper,
   MathUtils,
   Vector3,
   CatmullRomCurve3,
@@ -275,6 +275,17 @@ const Scene = ({ parentRef, addTimer }) => {
           store.level = 7;
           addTimer(30);
           break;
+        case 7:
+          store.yellowCount = 5;
+          store.blueCount = 4;
+          store.redCount = 4;
+          store.greenCount = 5;
+          store.level = 8;
+          addTimer(25);
+          break;
+        case 8:
+          store.level = 9;
+          break;
 
         default:
           return;
@@ -337,6 +348,14 @@ const Scene = ({ parentRef, addTimer }) => {
           store.redCount = 4;
           store.greenCount = 5;
           break;
+
+        case 7:
+          store.yellowCount = 5;
+          store.blueCount = 4;
+          store.redCount = 4;
+          store.greenCount = 5;
+          break;
+
         default:
           return;
       }
@@ -564,12 +583,6 @@ export default function App() {
 
   return (
     <>
-      {/* <div
-        className={clsx(
-          "pointer-events-none fixed inset-0 z-[100] h-full w-full opacity-0 backdrop-blur-xl"
-          // "pointer-events-auto opacity-100"
-        )}
-      ></div> */}
       <div
         ref={parentRef}
         className="fixed inset-0 h-full w-full overflow-hidden"
@@ -588,6 +601,7 @@ export default function App() {
                     store.showCount = true;
                     store.showConfetti = false;
                     store.timerExpired = false;
+                    store.showTutorial = false;
                     break;
                   case 2:
                     store.gameOn = true;
@@ -614,6 +628,16 @@ export default function App() {
                     store.showConfetti = false;
                     store.timerExpired = false;
                     break;
+                  case 7:
+                    store.gameOn = true;
+                    store.showConfetti = false;
+                    store.timerExpired = false;
+                    break;
+                  case 8:
+                    store.gameOn = true;
+                    store.showConfetti = false;
+                    store.timerExpired = false;
+                    break;
                   // case 7:
                   //   store.gameOn = true;
                   //   store.showConfetti = false;
@@ -629,9 +653,9 @@ export default function App() {
                 animate={{ scale: 1 }}
                 className="font-fira"
               >
-                {!snap.showContinue && snap.level !== 7 && "START"}
-                {snap.showContinue && snap.level !== 7 && "CONTINUE"}
-                {snap.level == 7 && "GG!"}
+                {!snap.showContinue && "START"}
+                {snap.showContinue && snap.level !== 9 && "CONTINUE"}
+                {snap.level == 9 && "GG!"}
               </motion.div>
             </motion.div>
           )}
@@ -640,22 +664,6 @@ export default function App() {
         {timer.map((timer) => {
           return <MyTimer time={timer.time} key={uuidv4()} />;
         })}
-
-        {/* ////////////////////////////////// */}
-        <div className="fixed right-4 top-4 z-30">
-          <motion.div
-            initial={{ scale: 1, opacity: 1 }}
-            animate={{
-              scale: 1,
-              opacity: 1,
-            }}
-            className="z-30 flex px-2 py-[1px] text-center font-super text-4xl text-slate-50"
-            transition={{ scale: { delay: 1.3 }, opacity: { duration: 0.4 } }}
-          >
-            <div className="text-slate-300">Twisted&nbsp;</div>
-            <div className="">Twister</div>
-          </motion.div>
-        </div>
         {/* ////////////////////////////////// */}
         <Canvas
           className="pointer-events-none h-full w-full"
@@ -671,6 +679,33 @@ export default function App() {
             <Scene parentRef={parentRef} addTimer={addTimer} />
           </Bvh>
         </Canvas>
+      </div>
+      <div className="fixed right-4 top-4 z-30">
+        <motion.div
+          initial={{ scale: 1, opacity: 1 }}
+          animate={{
+            scale: 1,
+            opacity: 1,
+          }}
+          className="z-30 flex px-2 py-[1px] text-center font-super text-4xl text-slate-50"
+          transition={{ scale: { delay: 1.3 }, opacity: { duration: 0.4 } }}
+        >
+          <div className="text-slate-300">Twisted&nbsp;</div>
+          <div className="">Twister</div>
+        </motion.div>
+      </div>
+      <div className="fixed bottom-10 left-0 right-0 z-30 ">
+        <motion.div
+          initial={{ scale: 1, opacity: 1 }}
+          animate={{
+            scale: !snap.gameOn && snap.showTutorial ? 1 : 0,
+            opacity: !snap.gameOn && snap.showTutorial ? 1 : 0,
+          }}
+          className="px-2 text-center font-fira text-2xl text-slate-50"
+          transition={{ scale: { delay: 1.3 }, opacity: { duration: 0.4 } }}
+        >
+          <div className="text-slate-300">Drag & Match Color</div>
+        </motion.div>
       </div>
     </>
   );

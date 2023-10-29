@@ -2,8 +2,8 @@
 
 This project was created for the Fall 2023 React Game Jam.
 
-Jam theme was “Classics with a Twist!” and my mind eventually wandered towards my childhood playing Twister.
+Jam theme was “Classics with a Twist!” and my mind eventually wandered towards an awkward childhood playing Twister.
 
-todo:
+Made w/ @react-three/fiber, framer-motion, valtio
 
-- check if sphere colors are accessible across people's visible ranges
+Desktop/Mobile friendly.

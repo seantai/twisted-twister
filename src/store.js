@@ -14,6 +14,7 @@ export const store = proxy({
   showContinue: false,
   showCount: false,
   showConfetti: false,
+  showTutorial: true,
 
   playDump: false,
   playLevelComplete: false,
