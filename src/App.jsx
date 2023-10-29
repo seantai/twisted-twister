@@ -2,7 +2,6 @@ import {
   CameraControls,
   Html,
   StatsGl,
-  useGLTF,
   useTexture,
   // useHelper,
   Bvh,
@@ -18,6 +17,7 @@ import {
   CatmullRomCurve3,
 } from "three";
 import { DragControls } from "./components/CustomDragControls";
+import { useGLTF } from "./components/CustomUseGLTF";
 import { Capsule } from "./components/Capsule";
 import { MyTimer } from "./components/Timer";
 
@@ -42,7 +42,7 @@ const Scene = ({ parentRef, addTimer }) => {
   const { controls, camera } = useThree();
 
   const { nodes } = useGLTF("./1026_BackdropSpheres.glb");
-  const Dump = useGLTF("./1026_Dump-transformed.glb");
+  const Dump = useGLTF("./1026_Dump-transformed.glb", true);
 
   const snap = useSnapshot(store);
 
@@ -687,14 +687,15 @@ export default function App() {
             scale: 1,
             opacity: 1,
           }}
-          className="z-30 flex px-2 py-[1px] text-center font-super text-4xl text-slate-50"
+          className="z-10 flex select-none px-2 py-[1px] text-center font-super text-4xl text-slate-50"
           transition={{ scale: { delay: 1.3 }, opacity: { duration: 0.4 } }}
         >
           <div className="text-slate-300">Twisted&nbsp;</div>
+          <div className="sr-only">Twisted&nbsp;</div>
           <div className="">Twister</div>
         </motion.div>
       </div>
-      <div className="fixed bottom-10 left-0 right-0 z-30 ">
+      <div className="fixed bottom-10 left-0 right-0 z-30">
         <motion.div
           initial={{ scale: 1, opacity: 1 }}
           animate={{
@@ -704,7 +705,8 @@ export default function App() {
           className="px-2 text-center font-fira text-2xl text-slate-50"
           transition={{ scale: { delay: 1.3 }, opacity: { duration: 0.4 } }}
         >
-          <div className="text-slate-300">Drag & Match Color</div>
+          <div className="select-none text-slate-300">Drag & Match Color</div>
+          <div className="sr-only">Drag & Match Color</div>
         </motion.div>
       </div>
     </>
